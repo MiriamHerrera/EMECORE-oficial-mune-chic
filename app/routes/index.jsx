@@ -78,7 +78,7 @@ export default function Index() {
         <div className="flex-1 flex items-center justify-center relative mt-12 md:mt-0">
           <div className="w-[350px] h-[250px] md:w-[420px] md:h-[300px] bg-[#ebc7a1] rounded-xl shadow-lg flex items-center justify-center relative shadow-xl" style={{ border: 'solid 4px #d9a398' }}>
             
-          <img width="260" height="120" viewBox="0 0 180 120" fill="none" class="shadow-xl" src="https://i.pinimg.com/736x/25/62/7a/25627adcecab931a5766e6e9a728c16b.jpg"/>
+          <img width="260" height="120" viewBox="0 0 180 120" fill="none" className="shadow-xl" src="https://i.pinimg.com/736x/25/62/7a/25627adcecab931a5766e6e9a728c16b.jpg"/>
             {/* <svg width="180" height="120" viewBox="0 0 180 120" fill="none" xmlns="http://www.w3.org/2000/svg">
               <ellipse cx="90" cy="60" rx="80" ry="40" fill="#EBC7A1" />
               <ellipse cx="120" cy="50" rx="30" ry="20" fill="#F7F3ED" />
