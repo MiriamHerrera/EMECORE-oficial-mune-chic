@@ -1,7 +1,5 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import styles from "./styles/tailwind.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import Layout from "./components/Layout";
 import WhatsAppFloat from "./components/WhatsAppFloat";
 
@@ -31,15 +29,13 @@ export default function App() {
         <Links />
       </head>
       <body className="h-full bg-white">
-        <Header />
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 shadow-xl">
+        <Layout>
           <Outlet />
-        </main>
-        <Footer />
+        </Layout>
         <WhatsAppFloat />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
-} 
+}
