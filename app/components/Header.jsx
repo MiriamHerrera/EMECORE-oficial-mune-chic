@@ -14,6 +14,12 @@ export default function Header() {
           <Link to="/marcas" className="text-black hover:text-secondary transition-colors font-medium">Marcas</Link>
           <Link to="/nosotros" className="text-black hover:text-secondary transition-colors font-medium">Nosotros</Link>
           <Link to="/contacto" className="text-black hover:text-secondary transition-colors font-medium">Contacto</Link>
+          <Link
+            to="/admin/inventory/"
+            className="text-[#B88A1A] hover:text-[#a07616]"
+          >
+            Admin
+          </Link>
         </div>
         <button
           className="md:hidden focus:outline-none"

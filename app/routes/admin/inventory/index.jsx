@@ -1,0 +1,281 @@
+import { useState } from 'react';
+import { Form, useActionData, useLoaderData } from '@remix-run/react';
+import { json, redirect } from '@remix-run/node';
+import { prisma } from '~/utils/prisma.server';
+
+// Loader to fetch products with their details
+export async function loader({ request }) {
+  const products = await prisma.product.findMany({
+    include: {
+      brand: true,
+      details: true,
+      categories: {
+        include: { category: true }
+      },
+      tags: {
+        include: { tag: true }
+      }
+    },
+    orderBy: { created_at: 'desc' }
+  });
+
+  const brands = await prisma.brand.findMany();
+  const categories = await prisma.category.findMany();
+  const tags = await prisma.tag.findMany();
+
+  return json({ products, brands, categories, tags });
+}
+
+// Action to handle product creation
+export async function action({ request }) {
+  const formData = await request.formData();
+  const intent = formData.get('intent');
+
+  if (intent === 'create') {
+    const name = formData.get('name');
+    const description = formData.get('description');
+    const price = parseFloat(formData.get('price'));
+    const brandId = parseInt(formData.get('brandId'));
+    const categoryIds = formData.getAll('categories').map(id => parseInt(id));
+    const tagIds = formData.getAll('tags').map(id => parseInt(id));
+    
+    // Create slug from name
+    const slug = name.toLowerCase().replace(/\s+/g, '-');
+
+    try {
+      const product = await prisma.product.create({
+        data: {
+          name,
+          slug,
+          description,
+          price,
+          brand_id: brandId,
+          categories: {
+            create: categoryIds.map(categoryId => ({
+              category: { connect: { id: categoryId } }
+            }))
+          },
+          tags: {
+            create: tagIds.map(tagId => ({
+              tag: { connect: { id: tagId } }
+            }))
+          },
+          details: {
+            create: {
+              stock: 0,
+              sku: `SKU-${Date.now()}`
+            }
+          }
+        }
+      });
+
+      return redirect('/admin/inventory');
+    } catch (error) {
+      return json({ error: 'Error creating product' }, { status: 400 });
+    }
+  }
+
+  return json({ error: 'Invalid intent' }, { status: 400 });
+}
+
+export default function AdminInventory() {
+  const { products, brands, categories, tags } = useLoaderData();
+  const actionData = useActionData();
+  const [isCreating, setIsCreating] = useState(false);
+
+  return (
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Inventory Management</h1>
+        <button
+          onClick={() => setIsCreating(true)}
+          className="bg-[#B88A1A] text-white px-4 py-2 rounded hover:bg-[#a07616]"
+        >
+          Add New Product
+        </button>
+      </div>
+
+      {/* Create Product Form */}
+      {isCreating && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+            <h2 className="text-xl font-bold mb-4">Create New Product</h2>
+            <Form method="post" className="space-y-4">
+              <input type="hidden" name="intent" value="create" />
+              
+              <div>
+                <label className="block mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  className="w-full border rounded p-2"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Description</label>
+                <textarea
+                  name="description"
+                  className="w-full border rounded p-2"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  step="0.01"
+                  required
+                  className="w-full border rounded p-2"
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">Brand</label>
+                <select name="brandId" className="w-full border rounded p-2">
+                  <option value="">Select a brand</option>
+                  {brands.map(brand => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-1">Categories</label>
+                <select
+                  name="categories"
+                  multiple
+                  className="w-full border rounded p-2"
+                >
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-1">Tags</label>
+                <select
+                  name="tags"
+                  multiple
+                  className="w-full border rounded p-2"
+                >
+                  {tags.map(tag => (
+                    <option key={tag.id} value={tag.id}>
+                      {tag.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsCreating(false)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#B88A1A] text-white px-4 py-2 rounded"
+                >
+                  Create Product
+                </button>
+              </div>
+            </Form>
+          </div>
+        </div>
+      )}
+
+      {/* Products Table */}
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Product
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Brand
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Price
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Stock
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {products.map((product) => (
+              <tr key={product.id}>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex items-center">
+                    {product.image_url && (
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="h-10 w-10 rounded-full mr-3"
+                      />
+                    )}
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {product.name}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {product.description}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {product.brand?.name}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    ${product.price.toFixed(2)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    {product.details[0]?.stock || 0}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                  }`}>
+                    {product.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button className="text-[#B88A1A] hover:text-[#a07616] mr-3">
+                    Edit
+                  </button>
+                  <button className="text-red-600 hover:text-red-900">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
