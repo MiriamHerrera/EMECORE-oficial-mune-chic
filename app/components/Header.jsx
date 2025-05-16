@@ -15,7 +15,7 @@ export default function Header() {
           <Link to="/nosotros" className="text-black hover:text-secondary transition-colors font-medium">Nosotros</Link>
           <Link to="/contacto" className="text-black hover:text-secondary transition-colors font-medium">Contacto</Link>
           <Link
-            to="/admin/inventory/"
+            to="/admin"
             className="text-[#B88A1A] hover:text-[#a07616]"
           >
             Admin
@@ -42,8 +42,9 @@ export default function Header() {
           <Link to="/marcas" className="block text-black hover:text-secondary transition-colors font-medium" onClick={() => setIsMenuOpen(false)}>Marcas</Link>
           <Link to="/nosotros" className="block text-black hover:text-secondary transition-colors font-medium" onClick={() => setIsMenuOpen(false)}>Nosotros</Link>
           <Link to="/contacto" className="block text-black hover:text-secondary transition-colors font-medium" onClick={() => setIsMenuOpen(false)}>Contacto</Link>
+          <Link to="/admin" className="block text-[#B88A1A] hover:text-[#a07616]" onClick={() => setIsMenuOpen(false)}>Admin</Link>
         </div>
       )}
     </header>
   );
-} 
+}

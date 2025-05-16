@@ -1,33 +1,52 @@
+// app/routes/admin/inventory/index.jsx
 import { useState } from 'react';
-import { Form, useActionData, useLoaderData } from '@remix-run/react';
+import { Form, useActionData, useLoaderData, Outlet } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import { prisma } from '~/utils/prisma.server';
+import { requireAdmin } from '~/utils/auth.server';
 
 // Loader to fetch products with their details
 export async function loader({ request }) {
-  const products = await prisma.product.findMany({
-    include: {
-      brand: true,
-      details: true,
-      categories: {
-        include: { category: true }
+  // Check if user is authenticated
+  await requireAdmin(request);
+  
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        brand: true,
+        details: true,
+        categories: {
+          include: { category: true }
+        },
+        tags: {
+          include: { tag: true }
+        }
       },
-      tags: {
-        include: { tag: true }
-      }
-    },
-    orderBy: { created_at: 'desc' }
-  });
+      orderBy: { created_at: 'desc' }
+    });
 
-  const brands = await prisma.brand.findMany();
-  const categories = await prisma.category.findMany();
-  const tags = await prisma.tag.findMany();
+    const brands = await prisma.brand.findMany();
+    const categories = await prisma.category.findMany();
+    const tags = await prisma.tag.findMany();
 
-  return json({ products, brands, categories, tags });
+    return json({ products, brands, categories, tags });
+  } catch (error) {
+    console.error("Database error:", error);
+    return json({ 
+      products: [], 
+      brands: [], 
+      categories: [], 
+      tags: [],
+      error: "Failed to load data"
+    });
+  }
 }
 
 // Action to handle product creation
 export async function action({ request }) {
+  // Check if user is authenticated
+  await requireAdmin(request);
+  
   const formData = await request.formData();
   const intent = formData.get('intent');
 
@@ -69,7 +88,7 @@ export async function action({ request }) {
         }
       });
 
-      return redirect('/admin/inventory');
+      return redirect('/admin/inventory/index');
     } catch (error) {
       return json({ error: 'Error creating product' }, { status: 400 });
     }
@@ -79,7 +98,8 @@ export async function action({ request }) {
 }
 
 export default function AdminInventory() {
-  const { products, brands, categories, tags } = useLoaderData();
+  const loaderData = useLoaderData();
+  const { products = [], brands = [], categories = [], tags = [] } = loaderData || {};
   const actionData = useActionData();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -194,6 +214,13 @@ export default function AdminInventory() {
         </div>
       )}
 
+      {/* Error message if any */}
+      {loaderData?.error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {loaderData.error}
+        </div>
+      )}
+
       {/* Products Table */}
       <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="min-w-full">
@@ -220,62 +247,72 @@ export default function AdminInventory() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
-              <tr key={product.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    {product.image_url && (
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="h-10 w-10 rounded-full mr-3"
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">
-                        {product.name}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {product.description}
+            {products.length > 0 ? (
+              products.map((product) => (
+                <tr key={product.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      {product.image_url && (
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="h-10 w-10 rounded-full mr-3"
+                        />
+                      )}
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {product.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {product.description}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {product.brand?.name}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    ${product.price.toFixed(2)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">
-                    {product.details[0]?.stock || 0}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {product.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-[#B88A1A] hover:text-[#a07616] mr-3">
-                    Edit
-                  </button>
-                  <button className="text-red-600 hover:text-red-900">
-                    Delete
-                  </button>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {product.brand?.name}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      ${product.price.toFixed(2)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">
+                      {product.details[0]?.stock || 0}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {product.status || 'inactive'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button className="text-[#B88A1A] hover:text-[#a07616] mr-3">
+                      Edit
+                    </button>
+                    <button className="text-red-600 hover:text-red-900">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                  No products found
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
+
+      <Outlet />
     </div>
   );
 }
