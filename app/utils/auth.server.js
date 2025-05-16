@@ -53,3 +53,11 @@ export async function destroySession(request) {
     },
   });
 }
+
+export async function action({ request }) {
+  return destroySession(request);
+}
+
+export async function loader() {
+  return redirect("/login");
+}
