@@ -1,7 +1,7 @@
 import { Link } from "@remix-run/react";
-import { prisma } from '~/utils/prisma.server';
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { prisma } from "~/utils/prisma.server";
 
 export async function loader() {
   // Trae productos con marca y categorías
