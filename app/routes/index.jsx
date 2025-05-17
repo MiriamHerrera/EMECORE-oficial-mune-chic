@@ -147,14 +147,14 @@ export default function Index() {
       </section>
 
       {/* Nuestras Marcas */}
-      <section className="bg-[#F7F8FA] py-16 px-4" style={{ fontFamily: 'Lora, serif' }}>
+      <section className="bg-transparent py-16 px-4" style={{ fontFamily: 'Lora, serif' }}>
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-serif text-[#222] mb-2" style={{ fontFamily: 'Libre Baskerville, serif' }}>Nuestras Marcas</h2>
           <div className="h-1 w-16 bg-[#B88A1A] rounded mb-6"></div>
           <p className="text-lg text-[#444] mb-10">Trabajamos con las mejores marcas para ofrecerte productos de calidad garantizada.</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8">
             {brands.map((brand) => (
-              <div key={brand.id} className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
+              <div key={brand.id} className="bg-transparent rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
                 <span className="text-[#B88A1A] text-xl md:text-2xl font-serif tracking-wide select-none" style={{ fontFamily: 'Libre Baskerville, serif' }}>
                   {brand.name}
                 </span>

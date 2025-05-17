@@ -1,4 +1,3 @@
-import Layout from "~/components/Layout";
 
 export default function Marcas() {
   const brands = [
@@ -34,7 +33,6 @@ export default function Marcas() {
   ];
 
   return (
-    <Layout>
       <div className="container-custom py-12">
         <h1 className="text-4xl font-elegant text-center mb-12">Nuestras Marcas</h1>
 
@@ -87,6 +85,5 @@ export default function Marcas() {
           </a>
         </div>
       </div>
-    </Layout>
   );
 } 

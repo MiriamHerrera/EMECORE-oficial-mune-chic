@@ -1,4 +1,3 @@
-import Layout from "~/components/Layout";
 
 export default function Nosotros() {
   const values = [
@@ -32,7 +31,6 @@ export default function Nosotros() {
   ];
 
   return (
-    <Layout>
       <div className="container-custom py-12">
         {/* Hero Section */}
         <div className="relative h-[60vh] bg-primary mb-16">
@@ -137,6 +135,5 @@ export default function Nosotros() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 } 

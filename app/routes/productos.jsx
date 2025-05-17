@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useSearchParams } from "@remix-run/react";
-import Layout from "~/components/Layout";
 
 export default function Productos() {
   const [searchParams] = useSearchParams();
@@ -54,7 +53,6 @@ export default function Productos() {
   });
 
   return (
-    <Layout>
       <div className="container-custom py-8">
         <h1 className="text-4xl font-elegant mb-8">Nuestros Productos</h1>
 
@@ -177,6 +175,5 @@ export default function Productos() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 } 

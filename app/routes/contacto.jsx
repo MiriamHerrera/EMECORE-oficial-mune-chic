@@ -1,4 +1,3 @@
-import Layout from "~/components/Layout";
 
 export default function Contacto() {
   const contactInfo = {
@@ -13,7 +12,6 @@ export default function Contacto() {
   };
 
   return (
-    <Layout>
       <div className="container-custom py-12">
         <h1 className="text-4xl font-elegant text-center mb-12">Contacto</h1>
 
@@ -108,6 +106,5 @@ export default function Contacto() {
           </div>
         </div>
       </div>
-    </Layout>
   );
 } 
