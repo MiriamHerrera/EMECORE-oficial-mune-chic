@@ -151,7 +151,7 @@ export default function Index() {
   className="relative py-16 px-4 overflow-hidden"
   style={{
     fontFamily: 'Lora, serif',
-    backgroundImage: "url('/fondo.jpg')", // Cambia la ruta si tu imagen está en otro lugar
+    backgroundImage: "url('/fondo2.jpg')", // Cambia la ruta si tu imagen está en otro lugar
     backgroundAttachment: "fixed",
     backgroundSize: "cover",
     backgroundPosition: "center",
@@ -163,13 +163,18 @@ export default function Index() {
     <div className="h-1 w-16 bg-[#B88A1A] rounded mb-6"></div>
     <p className="text-lg text-[#444] mb-10">Trabajamos con las mejores marcas para ofrecerte productos de calidad garantizada.</p>
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8">
-      {brands.map((brand) => (
-        <div key={brand.id} className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
-          <span className="text-[#B88A1A] text-xl md:text-2xl font-serif tracking-wide select-none" style={{ fontFamily: 'Libre Baskerville, serif' }}>
-            {brand.name}
-          </span>
-        </div>
-      ))}
+      <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
+        <img src="/marca1.png" alt="Puma" className="max-h-20 object-contain" />
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
+        <img src="/marca2.png" alt="Reebok" className="max-h-20 object-contain" />
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
+        <img src="/marca3.png" alt="Nike" className="max-h-20 object-contain" />
+      </div>
+      <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
+        <img src="/marca4.png" alt="Adidas" className="max-h-20 object-contain" />
+      </div>
     </div>
   </div>
 </section>
