@@ -98,8 +98,13 @@ export async function action({ request }) {
   // Eliminar producto
   if (intent === 'delete') {
     const id = formData.get('id');
-    if (id) {
+    if (id && !isNaN(Number(id))) {
       try {
+        // Elimina relaciones hijas primero
+        await prisma.productDetail.deleteMany({ where: { productId: Number(id) } });
+        await prisma.productCategory.deleteMany({ where: { productId: Number(id) } });
+        await prisma.productTag.deleteMany({ where: { productId: Number(id) } });
+        // Ahora elimina el producto
         await prisma.product.delete({
           where: { id: Number(id) }
         });
@@ -107,6 +112,8 @@ export async function action({ request }) {
       } catch (error) {
         return json({ error: 'Error deleting product' }, { status: 400 });
       }
+    } else {
+      return json({ error: 'Invalid product id' }, { status: 400 });
     }
   }
 
@@ -430,9 +437,21 @@ export default function AdminInventory() {
                     >
                       Edit
                     </button>
-                    <button className="text-red-600 hover:text-red-900">
-                      Delete
-                    </button>
+                    <Form method="post" style={{ display: "inline" }}>
+                      <input type="hidden" name="intent" value="delete" />
+                      <input type="hidden" name="id" value={product.id} />
+                      <button
+                        type="submit"
+                        className="text-red-600 hover:text-red-900"
+                        onClick={e => {
+                          if (!window.confirm("¿Seguro que deseas eliminar este producto?")) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </Form>
                   </td>
                 </tr>
               ))
