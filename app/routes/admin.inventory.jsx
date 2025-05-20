@@ -1,4 +1,4 @@
-// app/routes/admin/inventory/index.jsx
+// app/routes/admin/inventory.jsx
 import { useState } from 'react';
 import { Form, useActionData, useLoaderData, Outlet } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
@@ -89,7 +89,7 @@ export async function action({ request }) {
         }
       });
 
-      return redirect('/admin/inventory/index');
+      return redirect('/admin/inventory');
     } catch (error) {
       return json({ error: 'Error creating product' }, { status: 400 });
     }
@@ -103,7 +103,7 @@ export async function action({ request }) {
         await prisma.product.delete({
           where: { id: Number(id) }
         });
-        return redirect('/admin/inventory/index');
+        return redirect('/admin/inventory');
       } catch (error) {
         return json({ error: 'Error deleting product' }, { status: 400 });
       }
@@ -130,7 +130,7 @@ export async function action({ request }) {
             brand_id: brandId || null,
           }
         });
-        return redirect('/admin/inventory/index');
+        return redirect('/admin/inventory');
       } catch (error) {
         return json({ error: 'Error editing product' }, { status: 400 });
       }
