@@ -57,7 +57,7 @@ export async function action({ request }) {
     const description = formData.get('description');
     const price = parseFloat(formData.get('price'));
     const brandId = parseInt(formData.get('brandId'));
-    const categoryIds = formData.getAll('categories').map(id => parseInt(id));
+    const categoryId = parseInt(formData.get('categories'));
     const tagIds = formData.getAll('tags').map(id => parseInt(id));
     
     // Create slug from name
@@ -72,9 +72,7 @@ export async function action({ request }) {
           price,
           brand_id: brandId,
           categories: {
-            create: categoryIds.map(categoryId => ({
-              category: { connect: { id: categoryId } }
-            }))
+            create: categoryId ? [{ category: { connect: { id: categoryId } } }] : []
           },
           tags: {
             create: tagIds.map(tagId => ({
@@ -233,9 +231,10 @@ export default function AdminInventory() {
                 <label className="block mb-1">Categories</label>
                 <select
                   name="categories"
-                  multiple
                   className="w-full border rounded p-2"
+                  required
                 >
+                  <option value="">Select a category</option>
                   {categories.map(category => (
                     <option key={category.id} value={category.id}>
                       {category.name}
