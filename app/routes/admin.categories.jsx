@@ -1,6 +1,7 @@
 import { json, redirect } from "@remix-run/node";
-import { useLoaderData, Form } from "@remix-run/react";
+import { useLoaderData, Form, useNavigation } from "@remix-run/react";
 import { prisma } from "~/utils/prisma.server";
+import { useRef, useEffect } from "react";
 
 // Loader: obtener todas las categorías
 export async function loader() {
@@ -42,6 +43,15 @@ export async function action({ request }) {
 
 export default function AdminCategories() {
   const { categories } = useLoaderData();
+  const inputRef = useRef(null);
+  const navigation = useNavigation();
+
+  // Limpiar el input cuando la navegación termine (después de crear)
+  useEffect(() => {
+    if (navigation.state === "idle" && inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, [navigation.state]);
 
   return (
     <div>
@@ -49,6 +59,7 @@ export default function AdminCategories() {
       <p>Aquí puedes gestionar las Categories de los clientes.</p>
       <Form method="post" className="mb-4 flex gap-2">
         <input
+          ref={inputRef}
           type="text"
           name="name"
           placeholder="Nueva categoría"

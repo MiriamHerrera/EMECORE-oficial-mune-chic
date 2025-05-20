@@ -46,10 +46,11 @@ export async function loader({ request }) {
 export async function action({ request }) {
   // Check if user is authenticated
   await requireAdmin(request);
-  
+
   const formData = await request.formData();
   const intent = formData.get('intent');
 
+  // Crear producto (ya lo tienes)
   if (intent === 'create') {
     const name = formData.get('name');
     const description = formData.get('description');
@@ -94,6 +95,48 @@ export async function action({ request }) {
     }
   }
 
+  // Eliminar producto
+  if (intent === 'delete') {
+    const id = formData.get('id');
+    if (id) {
+      try {
+        await prisma.product.delete({
+          where: { id: Number(id) }
+        });
+        return redirect('/admin/inventory/index');
+      } catch (error) {
+        return json({ error: 'Error deleting product' }, { status: 400 });
+      }
+    }
+  }
+
+  // Editar producto
+  if (intent === 'edit') {
+    const id = formData.get('id');
+    const name = formData.get('name');
+    const description = formData.get('description');
+    const price = parseFloat(formData.get('price'));
+    const brandId = parseInt(formData.get('brandId'));
+    // Puedes agregar edición de categorías y tags si lo necesitas
+
+    if (id && name && !isNaN(price)) {
+      try {
+        await prisma.product.update({
+          where: { id: Number(id) },
+          data: {
+            name,
+            description,
+            price,
+            brand_id: brandId || null,
+          }
+        });
+        return redirect('/admin/inventory/index');
+      } catch (error) {
+        return json({ error: 'Error editing product' }, { status: 400 });
+      }
+    }
+  }
+
   return json({ error: 'Invalid intent' }, { status: 400 });
 }
 
@@ -102,6 +145,7 @@ export default function AdminInventory() {
   const { products = [], brands = [], categories = [], tags = [] } = loaderData || {};
   const actionData = useActionData();
   const [isCreating, setIsCreating] = useState(false);
+  const [isEditing, setIsEditing] = useState(null);
 
   return (
     <div className="p-6">
@@ -214,6 +258,79 @@ export default function AdminInventory() {
         </div>
       )}
 
+      {/* Edit Product Form */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+            <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+            <Form method="post" className="space-y-4">
+              <input type="hidden" name="intent" value="edit" />
+              <input type="hidden" name="id" value={isEditing.id} />
+
+              <div>
+                <label className="block mb-1">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  defaultValue={isEditing.name}
+                  required
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Description</label>
+                <textarea
+                  name="description"
+                  defaultValue={isEditing.description}
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  step="0.01"
+                  defaultValue={isEditing.price}
+                  required
+                  className="w-full border rounded p-2"
+                />
+              </div>
+              <div>
+                <label className="block mb-1">Brand</label>
+                <select
+                  name="brandId"
+                  defaultValue={isEditing.brand_id || ""}
+                  className="w-full border rounded p-2"
+                >
+                  <option value="">Select a brand</option>
+                  {brands.map(brand => (
+                    <option key={brand.id} value={brand.id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-4">
+                <button
+                  type="button"
+                  onClick={() => setIsEditing(null)}
+                  className="px-4 py-2 border rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-[#B88A1A] text-white px-4 py-2 rounded"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </Form>
+          </div>
+        </div>
+      )}
+
       {/* Error message if any */}
       {loaderData?.error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -294,7 +411,10 @@ export default function AdminInventory() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-[#B88A1A] hover:text-[#a07616] mr-3">
+                    <button 
+                      onClick={() => setIsEditing(product)}
+                      className="text-[#B88A1A] hover:text-[#a07616] mr-3"
+                    >
                       Edit
                     </button>
                     <button className="text-red-600 hover:text-red-900">
