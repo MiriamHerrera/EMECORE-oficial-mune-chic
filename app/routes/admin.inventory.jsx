@@ -123,10 +123,22 @@ export async function action({ request }) {
     const description = formData.get('description');
     const price = parseFloat(formData.get('price'));
     const brandId = parseInt(formData.get('brandId'));
-    // Puedes agregar edición de categorías y tags si lo necesitas
+    const status = formData.get('status');
+    const categoryId = parseInt(formData.get('categoryId'));
 
     if (id && name && !isNaN(price)) {
       try {
+        // Elimina relaciones anteriores
+        await prisma.productCategory.deleteMany({ where: { productId: Number(id) } });
+        if (categoryId && !isNaN(categoryId)) {
+          await prisma.productCategory.create({
+            data: {
+              productId: Number(id),
+              categoryId: categoryId,
+            }
+          });
+        }
+
         await prisma.product.update({
           where: { id: Number(id) },
           data: {
@@ -134,6 +146,7 @@ export async function action({ request }) {
             description,
             price,
             brand_id: brandId || null,
+            status: status || "active",
           }
         });
         return redirect('/admin/inventory');
@@ -327,6 +340,34 @@ export default function AdminInventory() {
                   {brands.map(brand => (
                     <option key={brand.id} value={brand.id}>
                       {brand.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1">Status</label>
+                <select
+                  name="status"
+                  defaultValue={isEditing.status || "active"}
+                  className="w-full border rounded p-2"
+                  required
+                >
+                  <option value="active">Activo</option>
+                  <option value="inactive">Inactivo</option>
+                </select>
+              </div>
+              <div>
+                <label className="block mb-1">Categoría</label>
+                <select
+                  name="categoryId"
+                  defaultValue={isEditing.categories?.[0]?.category_id || ""}
+                  className="w-full border rounded p-2"
+                  required
+                >
+                  <option value="">Selecciona una categoría</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
                     </option>
                   ))}
                 </select>
