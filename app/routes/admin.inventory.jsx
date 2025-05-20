@@ -4,6 +4,7 @@ import { Form, useActionData, useLoaderData, Outlet, useNavigation } from '@remi
 import { json, redirect } from '@remix-run/node';
 import { prisma } from '~/utils/prisma.server';
 import { requireAdmin } from '~/utils/auth.server';
+import Swal from 'sweetalert2';
 
 // Loader to fetch products with their details
 export async function loader({ request }) {
@@ -437,17 +438,31 @@ export default function AdminInventory() {
                     >
                       Edit
                     </button>
-                    <Form method="post" style={{ display: "inline" }}>
+                    <Form
+                      method="post"
+                      style={{ display: "inline" }}
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const result = await Swal.fire({
+                          title: '¿Seguro que deseas eliminar este producto?',
+                          text: "Esta acción no se puede deshacer.",
+                          icon: 'warning',
+                          showCancelButton: true,
+                          confirmButtonColor: '#B88A1A',
+                          cancelButtonColor: '#d33',
+                          confirmButtonText: 'Sí, eliminar',
+                          cancelButtonText: 'Cancelar'
+                        });
+                        if (result.isConfirmed) {
+                          e.target.submit();
+                        }
+                      }}
+                    >
                       <input type="hidden" name="intent" value="delete" />
                       <input type="hidden" name="id" value={product.id} />
                       <button
                         type="submit"
                         className="text-red-600 hover:text-red-900"
-                        onClick={e => {
-                          if (!window.confirm("¿Seguro que deseas eliminar este producto?")) {
-                            e.preventDefault();
-                          }
-                        }}
                       >
                         Delete
                       </button>
