@@ -1,6 +1,6 @@
 // app/routes/admin/inventory.jsx
-import { useState } from 'react';
-import { Form, useActionData, useLoaderData, Outlet } from '@remix-run/react';
+import { useState, useEffect } from 'react';
+import { Form, useActionData, useLoaderData, Outlet, useNavigation } from '@remix-run/react';
 import { json, redirect } from '@remix-run/node';
 import { prisma } from '~/utils/prisma.server';
 import { requireAdmin } from '~/utils/auth.server';
@@ -146,7 +146,15 @@ export default function AdminInventory() {
   const actionData = useActionData();
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(null);
+  const navigation = useNavigation();
 
+  // Cierra el modal de edición cuando la navegación termina y no hay error
+  useEffect(() => {
+    if (navigation.state === "idle" && isEditing) {
+      setIsEditing(null);
+    }
+  }, [navigation.state]);
+  
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
