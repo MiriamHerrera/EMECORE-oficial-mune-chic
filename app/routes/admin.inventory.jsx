@@ -150,8 +150,13 @@ export default function AdminInventory() {
 
   // Cierra el modal de edición cuando la navegación termina y no hay error
   useEffect(() => {
+    // Cierra el modal de edición cuando la navegación termina y estaba editando
     if (navigation.state === "idle" && isEditing) {
       setIsEditing(null);
+    }
+    // Cierra el modal de creación cuando la navegación termina y estaba creando
+    if (navigation.state === "idle" && isCreating) {
+      setIsCreating(false);
     }
   }, [navigation.state]);
   
