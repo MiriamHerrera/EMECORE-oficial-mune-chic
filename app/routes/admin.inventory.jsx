@@ -16,9 +16,7 @@ export async function loader({ request }) {
       include: {
         brand: true,
         details: true,
-        categories: {
-          include: { category: true }
-        },
+        categories: { include: { category: true } },
         tags: {
           include: { tag: true }
         }
@@ -360,7 +358,11 @@ export default function AdminInventory() {
                 <label className="block mb-1">Categoría</label>
                 <select
                   name="categoryId"
-                  defaultValue={isEditing.categories?.[0]?.category_id || ""}
+                  defaultValue={
+                    isEditing.categories?.[0]?.category_id // o prueba con categoryId si no funciona
+                      || isEditing.categories?.[0]?.categoryId
+                      || ""
+                  }
                   className="w-full border rounded p-2"
                   required
                 >
