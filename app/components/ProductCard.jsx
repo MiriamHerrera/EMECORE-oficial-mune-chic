@@ -22,8 +22,8 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
 
   return (
     <div className="bg-white rounded-xl shadow flex flex-col gap-2 p-4 mb-4">
-      {/* Grid principal: icono | info | expandir */}
-      <div className="grid grid-cols-[40px_1fr_auto] items-center gap-3">
+      {/* Grid principal: icono | info | badge+expandir */}
+      <div className="grid grid-cols-[40px_1fr_56px] items-center gap-3">
         {/* Ícono */}
         <div className="flex items-center justify-center text-2xl">
           {/* Puedes cambiar el emoji por un ícono si lo deseas */}
@@ -31,24 +31,24 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
         </div>
         {/* Info principal */}
         <div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-lg text-blue-800">{product.name}</span>
-            <span className="text-xs px-2 py-1 rounded-full font-semibold bg-yellow-100 text-yellow-800 ml-auto">
-              {stockStatus}
-            </span>
-          </div>
+          <span className="font-bold text-lg text-blue-800">{product.name}</span>
           <div className="text-base font-bold text-black">
             ${Number(product.price || 0).toFixed(2)}
           </div>
         </div>
-        {/* Botón expandir */}
-        <button
-          onClick={() => setIsExpanded((v) => !v)}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition"
-          aria-label={isExpanded ? "Colapsar" : "Expandir"}
-        >
-          {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-        </button>
+        {/* Badge y botón expandir en columna */}
+        <div className="flex flex-col items-end gap-2 h-full justify-between">
+          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${stockBadgeColor}`}>
+            {stockStatus}
+          </span>
+          <button
+            onClick={() => setIsExpanded((v) => !v)}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition"
+            aria-label={isExpanded ? "Colapsar" : "Expandir"}
+          >
+            {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+        </div>
       </div>
       {/* Detalles expandibles en grid */}
       {isExpanded && (
