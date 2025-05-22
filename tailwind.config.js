@@ -20,10 +20,7 @@ module.exports = {
       fontFamily: {
         elegant: ['Higuen Elegant Serif', 'serif'],
       },
-      backgroundImage: {
-        'mune': "url('/fondo.jpg')",
-      },
     },
   },
   plugins: [],
-}
+} 

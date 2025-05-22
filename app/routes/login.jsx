@@ -25,7 +25,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-2xl shadow-2xl border border-[#f5e2b8]">
         <div className="flex flex-col items-center">
           <img
-            src="/logo.png"
+            src="/images/logo.png"
             alt="Logo"
             className="w-16 h-16 mb-2"
             style={{ objectFit: "contain" }}

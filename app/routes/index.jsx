@@ -151,7 +151,7 @@ export default function Index() {
   className="relative py-16 px-4 overflow-hidden"
   style={{
     fontFamily: 'Lora, serif',
-    backgroundImage: "url('/fondo2.jpg')", // Cambia la ruta si tu imagen está en otro lugar
+    backgroundImage: "url('/images/fondo2.jpg')", // Cambia la ruta si tu imagen está en otro lugar
     backgroundAttachment: "fixed",
     backgroundSize: "cover",
     backgroundPosition: "center",
@@ -164,16 +164,16 @@ export default function Index() {
     <p className="text-lg text-[#444] mb-10">Trabajamos con las mejores marcas para ofrecerte productos de calidad garantizada.</p>
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 md:gap-8">
       <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
-        <img src="/marca1.png" alt="Puma" className="max-h-20 object-contain" />
+        <img src="/images/marca1.png" alt="Puma" className="max-h-20 object-contain" />
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
-        <img src="/marca2.png" alt="Reebok" className="max-h-20 object-contain" />
+        <img src="/images/marca2.png" alt="Reebok" className="max-h-20 object-contain" />
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
-        <img src="/marca3.png" alt="Nike" className="max-h-20 object-contain" />
+        <img src="/images/marca3.png" alt="Nike" className="max-h-20 object-contain" />
       </div>
       <div className="bg-white rounded-xl shadow-sm border border-[#F3E6D0] flex items-center justify-center h-32 md:h-36">
-        <img src="/marca4.png" alt="Adidas" className="max-h-20 object-contain" />
+        <img src="/images/marca4.png" alt="Adidas" className="max-h-20 object-contain" />
       </div>
     </div>
   </div>
@@ -184,7 +184,7 @@ export default function Index() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="flex justify-center">
             <div className="bg-[#FDE7EF] rounded-xl shadow-lg flex items-center justify-center w-full">
-              <img src="\imagenNosotros.jpg" alt="Descripción de la imagen" className="max-w-full h-auto rounded-lg"/>
+              <img src="\images\imagenNosotros.jpg" alt="Descripción de la imagen" className="max-w-full h-auto rounded-lg"/>
             </div>
           </div>
           <div>
