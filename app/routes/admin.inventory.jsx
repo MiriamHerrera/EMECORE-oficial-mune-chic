@@ -5,6 +5,7 @@ import { json, redirect } from '@remix-run/node';
 import { prisma } from '~/utils/prisma.server';
 import { requireAdmin } from '~/utils/auth.server';
 import Swal from 'sweetalert2';
+import ProductCard from '~/components/ProductCard';
 
 // Loader to fetch products with their details
 export async function loader({ request }) {
@@ -177,6 +178,38 @@ export default function AdminInventory() {
     }
   }, [navigation.state]);
   
+  // Función para editar producto
+  const handleEdit = (productId) => {
+    const product = products.find(p => p.id === productId);
+    setIsEditing(product);
+  };
+
+  // Función para eliminar producto
+  const handleDelete = async (productId) => {
+    const result = await Swal.fire({
+      title: '¿Seguro que deseas eliminar este producto?',
+      text: "Esta acción no se puede deshacer.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#B88A1A',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+    if (result.isConfirmed) {
+      // Crea un formulario y envíalo para eliminar el producto
+      const form = document.createElement('form');
+      form.method = 'post';
+      form.style.display = 'none';
+      form.innerHTML = `
+        <input type="hidden" name="intent" value="delete" />
+        <input type="hidden" name="id" value="${productId}" />
+      `;
+      document.body.appendChild(form);
+      form.submit();
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -401,134 +434,22 @@ export default function AdminInventory() {
         </div>
       )}
 
-      {/* Products Table */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="min-w-full">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Product
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Brand
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Stock
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {products.length > 0 ? (
-              products.map((product) => (
-                <tr key={product.id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      {product.image_url && (
-                        <img
-                          src={product.image_url}
-                          alt={product.name}
-                          className="h-10 w-10 rounded-full mr-3"
-                        />
-                      )}
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {product.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {product.description}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {product.brand?.name}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {product.categories[0]?.category?.name || "—"}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {product.price != null && !isNaN(Number(product.price))
-                        ? `$${Number(product.price).toFixed(2)}`
-                        : "—"}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {product.details[0]?.stock || 0}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {product.status || 'inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button 
-                      onClick={() => setIsEditing(product)}
-                      className="text-[#B88A1A] hover:text-[#a07616] mr-3"
-                    >
-                      Edit
-                    </button>
-                    <Form
-                      method="post"
-                      style={{ display: "inline" }}
-                      onSubmit={async (e) => {
-                        e.preventDefault();
-                        const result = await Swal.fire({
-                          title: '¿Seguro que deseas eliminar este producto?',
-                          text: "Esta acción no se puede deshacer.",
-                          icon: 'warning',
-                          showCancelButton: true,
-                          confirmButtonColor: '#B88A1A',
-                          cancelButtonColor: '#d33',
-                          confirmButtonText: 'Sí, eliminar',
-                          cancelButtonText: 'Cancelar'
-                        });
-                        if (result.isConfirmed) {
-                          e.target.submit();
-                        }
-                      }}
-                    >
-                      <input type="hidden" name="intent" value="delete" />
-                      <input type="hidden" name="id" value={product.id} />
-                      <button
-                        type="submit"
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Delete
-                      </button>
-                    </Form>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="px-6 py-4 text-center text-gray-500">
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      {/* Products Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-500">
+            No products found
+          </div>
+        )}
       </div>
 
       <Outlet />
