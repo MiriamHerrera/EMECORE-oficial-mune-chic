@@ -23,27 +23,28 @@ const ProductCard = ({ product, onEdit, onDelete }) => {
   return (
     <div className="bg-white rounded-xl shadow flex flex-col gap-2 p-4 mb-4">
       {/* Grid principal: icono | info | expandir */}
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
+      <div className="grid grid-cols-[40px_1fr_auto] items-center gap-3">
         {/* Ícono */}
-        <div className="bg-purple-100 rounded-full p-2 flex items-center justify-center">
-          {icon}
+        <div className="flex items-center justify-center text-2xl">
+          {/* Puedes cambiar el emoji por un ícono si lo deseas */}
+          <span role="img" aria-label="icono">{product.icon || "🧖‍♀️"}</span>
         </div>
-        {/* Nombre y precio */}
+        {/* Info principal */}
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-base">{product.name}</span>
-            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${stockBadgeColor}`}>
+            <span className="font-bold text-lg text-blue-800">{product.name}</span>
+            <span className="text-xs px-2 py-1 rounded-full font-semibold bg-yellow-100 text-yellow-800 ml-auto">
               {stockStatus}
             </span>
           </div>
-          <div className="text-lg font-bold text-gray-800">
+          <div className="text-base font-bold text-black">
             ${Number(product.price || 0).toFixed(2)}
           </div>
         </div>
         {/* Botón expandir */}
         <button
           onClick={() => setIsExpanded((v) => !v)}
-          className="bg-blue-100 hover:bg-blue-200 rounded-full p-2 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition"
           aria-label={isExpanded ? "Colapsar" : "Expandir"}
         >
           {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
